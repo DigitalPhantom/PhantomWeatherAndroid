@@ -1,1 +1,1 @@
-# Phantom Weather for Android
+# Phantom Weather App for Android
