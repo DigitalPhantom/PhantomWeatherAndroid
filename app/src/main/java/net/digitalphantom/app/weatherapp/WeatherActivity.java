@@ -24,7 +24,6 @@
  */
 package net.digitalphantom.app.weatherapp;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.ActionBarActivity;
@@ -38,7 +37,7 @@ import net.digitalphantom.app.weatherapp.data.Item;
 import net.digitalphantom.app.weatherapp.service.WeatherServiceCallback;
 import net.digitalphantom.app.weatherapp.service.YahooWeatherService;
 
-public class WeatherActivity extends Activity implements WeatherServiceCallback {
+public class WeatherActivity extends ActionBarActivity implements WeatherServiceCallback {
 
     private ImageView weatherIconImageView;
     private TextView temperatureTextView;
