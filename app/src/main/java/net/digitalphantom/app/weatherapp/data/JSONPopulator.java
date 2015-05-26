@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Yoel Nunez <dev@yoelnunez.com>
+ * Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,6 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- *
  */
 package net.digitalphantom.app.weatherapp.data;
 
@@ -28,4 +27,5 @@ import org.json.JSONObject;
 
 public interface JSONPopulator {
     void populate(JSONObject data);
+    JSONObject toJSON();
 }
