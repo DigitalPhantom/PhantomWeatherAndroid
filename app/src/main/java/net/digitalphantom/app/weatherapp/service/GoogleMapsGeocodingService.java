@@ -23,12 +23,13 @@
  */
 package net.digitalphantom.app.weatherapp.service;
 
-import android.net.Uri;
+import android.location.Location;
 import android.os.AsyncTask;
 
-import net.digitalphantom.app.weatherapp.data.Channel;
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener;
+import net.digitalphantom.app.weatherapp.data.LocationResult;
+import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -37,27 +38,22 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class YahooWeatherService {
-    private WeatherServiceListener listener;
+public class GoogleMapsGeocodingService {
+    private GeocodingServiceListener listener;
     private Exception error;
 
-    public YahooWeatherService(WeatherServiceListener listener) {
+    public GoogleMapsGeocodingService(GeocodingServiceListener listener) {
         this.listener = listener;
     }
 
-    public void refreshWeather(String location) {
-
-        new AsyncTask<String, Void, Channel>() {
+    public void refreshLocation(Location location) {
+        new AsyncTask<Location, Void, LocationResult>() {
             @Override
-            protected Channel doInBackground(String[] locations) {
+            protected LocationResult doInBackground(Location... locations) {
 
-                String location = locations[0];
+                Location location = locations[0];
 
-                Channel channel = new Channel();
-
-                String YQL = String.format("select * from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"%s\")", location);
-
-                String endpoint = String.format("https://query.yahooapis.com/v1/public/yql?q=%s&format=json", Uri.encode(YQL));
+                String endpoint = String.format("https://maps.googleapis.com/maps/api/geocode/json?latlng=%s,%s&key=%s", location.getLatitude(), location.getLongitude(), API_KEY);
 
                 try {
                     URL url = new URL(endpoint);
@@ -76,19 +72,18 @@ public class YahooWeatherService {
 
                     JSONObject data = new JSONObject(result.toString());
 
-                    JSONObject queryResults = data.optJSONObject("query");
+                    JSONArray results = data.optJSONArray("results");
 
-                    int count = queryResults.optInt("count");
+                    if (results.length() == 0) {
+                        error = new ReverseGeolocationException("Could not reverse geocode " + location.getLatitude() + ", " + location.getLongitude());
 
-                    if (count == 0) {
-                        error = new LocationWeatherException("No weather information found for " + location);
                         return null;
                     }
 
-                    JSONObject channelJSON = queryResults.optJSONObject("results").optJSONObject("channel");
-                    channel.populate(channelJSON);
+                    LocationResult locationResult = new LocationResult();
+                    locationResult.populate(results.optJSONObject(0));
 
-                    return channel;
+                    return locationResult;
 
                 } catch (Exception e) {
                     error = e;
@@ -98,12 +93,12 @@ public class YahooWeatherService {
             }
 
             @Override
-            protected void onPostExecute(Channel channel) {
+            protected void onPostExecute(LocationResult location) {
 
-                if (channel == null && error != null) {
-                    listener.serviceFailure(error);
+                if (location == null && error != null) {
+                    listener.geocodeFailure(error);
                 } else {
-                    listener.serviceSuccess(channel);
+                    listener.geocodeSuccess(location);
                 }
 
             }
@@ -111,8 +106,11 @@ public class YahooWeatherService {
         }.execute(location);
     }
 
-    public class LocationWeatherException extends Exception {
-        public LocationWeatherException(String detailMessage) {
+    // OPTIONAL: Your Google Maps API KEY
+    private static final String API_KEY = "";
+
+    private class ReverseGeolocationException extends Exception {
+        public ReverseGeolocationException(String detailMessage) {
             super(detailMessage);
         }
     }

@@ -26,16 +26,17 @@ package net.digitalphantom.app.weatherapp.data;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Units implements JSONPopulator {
-    private String temperature;
+public class LocationResult implements JSONPopulator {
 
-    public String getTemperature() {
-        return temperature;
+    private String address;
+
+    public String getAddress() {
+        return address;
     }
 
     @Override
     public void populate(JSONObject data) {
-        temperature = data.optString("temperature");
+        address = data.optString("formatted_address");
     }
 
     @Override
@@ -43,10 +44,8 @@ public class Units implements JSONPopulator {
         JSONObject data = new JSONObject();
 
         try {
-            data.put("temperature", temperature);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+            data.put("formatted_address", address);
+        } catch (JSONException e) {}
 
         return data;
     }
