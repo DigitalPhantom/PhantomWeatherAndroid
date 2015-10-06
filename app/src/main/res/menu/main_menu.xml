@@ -21,14 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
-<resources>
-    <string name="app_name">Phantom Weather</string>
-    <string name="temperature">Temperature</string>
-    <string name="condition">Condition</string>
-    <string name="location">Location</string>
-    <string name="powered_by_yahoo">powered by Yahoo!</string>
-    <string name="condition_icon">Condition Icon</string>
-    <string name="loading">Loading&#8230;</string>
-    <string name="temperature_output">%1$d&#176;%2$s</string>
-    <string name="update_location">Update Location</string>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:phantomweather="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/currentLocation"
+        android:icon="@drawable/ic_action_navigation_refresh"
+        android:title="@string/update_location"
+        phantomweather:showAsAction="ifRoom|withText" />
+</menu>

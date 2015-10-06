@@ -25,12 +25,17 @@ package net.digitalphantom.app.weatherapp;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +65,8 @@ public class WeatherActivity extends ActionBarActivity implements WeatherService
     // counter for failed weather service attempts
     private int weatherServiceFailures = 0;
 
+    private SharedPreferences preferences = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,16 +81,55 @@ public class WeatherActivity extends ActionBarActivity implements WeatherService
         geocodingService = new GoogleMapsGeocodingService(this);
         cacheService = new WeatherCacheService(this);
 
+        preferences = getPreferences(Context.MODE_PRIVATE);
+
         dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.loading));
+        dialog.setCancelable(false);
         dialog.show();
 
+
+        String cachedLocation = preferences.getString(getString(R.string.location), null);
+
+        if (cachedLocation == null) {
+            getWeatherFromCurrentLocation();
+        } else {
+            weatherService.refreshWeather(cachedLocation);
+        }
+
+    }
+
+    private void getWeatherFromCurrentLocation() {
         // system's LocationManager
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        // request GPS location from LocationManager
-        locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
+        // medium accuracy for weather, good for 100 - 500 meters
+        Criteria locationCriteria = new Criteria();
+        locationCriteria.setAccuracy(Criteria.ACCURACY_MEDIUM);
 
+        String provider = locationManager.getBestProvider(locationCriteria, true);
+
+        // single location update
+        locationManager.requestSingleUpdate(provider, this, null);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.currentLocation:
+                dialog.show();
+                getWeatherFromCurrentLocation();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -124,6 +170,10 @@ public class WeatherActivity extends ActionBarActivity implements WeatherService
     public void geocodeSuccess(LocationResult location) {
         // completed geocoding successfully
         weatherService.refreshWeather(location.getAddress());
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(getString(R.string.location), location.getAddress());
+        editor.commit();
     }
 
     @Override
