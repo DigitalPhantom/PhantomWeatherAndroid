@@ -82,38 +82,38 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (preferences.getBoolean(getString(R.string.pref_needs_setup), true)) {
-            startSettingsActivity();
-            return;
-        }
-
         weatherService = new YahooWeatherService(this);
         weatherService.setTemperatureUnit(preferences.getString(getString(R.string.pref_temperature_unit), null));
 
         geocodingService = new GoogleMapsGeocodingService(this);
         cacheService = new WeatherCacheService(this);
 
-        dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.loading));
-        dialog.setCancelable(false);
-        dialog.show();
-
-        String location = null;
-
-        if (preferences.getBoolean(getString(R.string.pref_geolocation_enabled), true)) {
-            String locationCache = preferences.getString(getString(R.string.pref_cached_location), null);
-
-            if (locationCache == null) {
-                getWeatherFromCurrentLocation();
-            } else {
-                location = locationCache;
-            }
+        if (preferences.getBoolean(getString(R.string.pref_needs_setup), true)) {
+            startSettingsActivity();
         } else {
-            location = preferences.getString(getString(R.string.pref_manual_location), null);
-        }
 
-        if(location != null) {
-            weatherService.refreshWeather(location);
+            dialog = new ProgressDialog(this);
+            dialog.setMessage(getString(R.string.loading));
+            dialog.setCancelable(false);
+            dialog.show();
+
+            String location = null;
+
+            if (preferences.getBoolean(getString(R.string.pref_geolocation_enabled), true)) {
+                String locationCache = preferences.getString(getString(R.string.pref_cached_location), null);
+
+                if (locationCache == null) {
+                    getWeatherFromCurrentLocation();
+                } else {
+                    location = locationCache;
+                }
+            } else {
+                location = preferences.getString(getString(R.string.pref_manual_location), null);
+            }
+
+            if(location != null) {
+                weatherService.refreshWeather(location);
+            }
         }
 
     }
