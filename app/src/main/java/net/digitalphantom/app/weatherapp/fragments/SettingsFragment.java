@@ -62,9 +62,11 @@ public class SettingsFragment extends PreferenceFragment implements Preference.O
 
         onSharedPreferenceChanged(null, null);
 
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(getString(R.string.pref_needs_setup), false);
-        editor.apply();
+        if(!preferences.getBoolean(getString(R.string.pref_needs_setup), false)) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean(getString(R.string.pref_needs_setup), false);
+            editor.apply();
+        }
 
         setHasOptionsMenu(true);
     }
