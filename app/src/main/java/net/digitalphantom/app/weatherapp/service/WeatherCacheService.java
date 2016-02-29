@@ -27,12 +27,14 @@ package net.digitalphantom.app.weatherapp.service;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import net.digitalphantom.app.weatherapp.R;
 import net.digitalphantom.app.weatherapp.data.Channel;
 import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener;
 
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -92,6 +94,8 @@ public class WeatherCacheService {
 
                     return channel;
 
+                } catch (FileNotFoundException e) { // cache file doesn't exist
+                    error = new CacheException(context.getString(R.string.cache_exception));
                 } catch (Exception e) {
                     error = e;
                 }
@@ -108,5 +112,11 @@ public class WeatherCacheService {
                 }
             }
         }.execute(listener);
+    }
+
+    public class CacheException extends Exception {
+        public CacheException(String detailMessage) {
+            super(detailMessage);
+        }
     }
 }

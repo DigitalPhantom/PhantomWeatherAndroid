@@ -32,4 +32,5 @@ THE SOFTWARE.
     <string name="temperature_output">%1$d&#176;%2$s</string>
     <string name="update_location">Update Location</string>
     <string name="settings">Settings</string>
+    <string name="cache_exception">No Cached Weather Data</string>
 </resources>

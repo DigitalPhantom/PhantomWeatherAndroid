@@ -188,6 +188,9 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
         } else {
             // error doing reverse geocoding, load weather data from cache
             weatherServicesHasFailed = true;
+            // OPTIONAL: let the user know an error has occurred then fallback to the cached data
+            Toast.makeText(this, exception.getMessage(), Toast.LENGTH_SHORT).show();
+
             cacheService.load(this);
         }
     }
