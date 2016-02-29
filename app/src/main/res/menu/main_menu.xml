@@ -23,7 +23,10 @@ THE SOFTWARE.
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:phantomweather="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/currentLocation"
-        android:icon="@drawable/ic_action_navigation_refresh"
+        android:icon="@drawable/icon_location"
         android:title="@string/update_location"
         phantomweather:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings"/>
 </menu>

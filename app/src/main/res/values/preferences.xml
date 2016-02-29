@@ -1,0 +1,48 @@
+<!--
+The MIT License (MIT)
+
+Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<resources>
+    <string name="pref_geolocation_enabled">geolocation_enabled</string>
+    <string name="pref_manual_location">manual_location</string>
+    <string name="pref_cached_location">cached_location</string>
+    <string name="pref_temperature_unit">temperature_unit</string>
+    <string name="pref_needs_setup">needs_setup</string>
+    <string name="pref_default_unit">C</string>
+
+    <string name="pref_header_general">General</string>
+    <string name="pref_title_enable_geolocation">Enable GeoLocation</string>
+    <string name="pref_description_enable_geolocation">Automatically obtain weather information based on my current location</string>
+
+    <string name="pref_title_manual_location">Manual Location</string>
+    <string name="pref_default_location">Austin, TX</string>
+
+    <string name="pref_title_temperature_unit">Temperature Unit</string>
+    <string-array name="pref_temperature_unit_titles">
+        <item>&#176;C</item>
+        <item>&#176;F</item>
+    </string-array>
+    <string-array name="pref_temperature_unit_values">
+        <item>C</item>
+        <item>F</item>
+    </string-array>
+</resources>

@@ -1,18 +1,18 @@
 /**
  * The MIT License (MIT)
- * <p/>
+ *
  * Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
- * <p/>
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * <p/>
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * <p/>
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,18 +20,21 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ *
  */
 package net.digitalphantom.app.weatherapp.service;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
+import net.digitalphantom.app.weatherapp.R;
 import net.digitalphantom.app.weatherapp.data.Channel;
 import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener;
 
 import org.json.JSONObject;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -91,6 +94,8 @@ public class WeatherCacheService {
 
                     return channel;
 
+                } catch (FileNotFoundException e) { // cache file doesn't exist
+                    error = new CacheException(context.getString(R.string.cache_exception));
                 } catch (Exception e) {
                     error = e;
                 }
@@ -107,5 +112,11 @@ public class WeatherCacheService {
                 }
             }
         }.execute(listener);
+    }
+
+    public class CacheException extends Exception {
+        public CacheException(String detailMessage) {
+            super(detailMessage);
+        }
     }
 }
