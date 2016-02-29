@@ -26,4 +26,7 @@ THE SOFTWARE.
         android:icon="@drawable/icon_location"
         android:title="@string/update_location"
         phantomweather:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings"/>
 </menu>
