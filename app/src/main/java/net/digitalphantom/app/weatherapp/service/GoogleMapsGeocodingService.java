@@ -71,6 +71,8 @@ public class GoogleMapsGeocodingService {
                         result.append(line);
                     }
 
+                    reader.close();
+
                     JSONObject data = new JSONObject(result.toString());
 
                     JSONArray results = data.optJSONArray("results");

@@ -86,6 +86,8 @@ public class YahooWeatherService {
                         result.append(line);
                     }
 
+                    reader.close();
+
                     JSONObject data = new JSONObject(result.toString());
 
                     JSONObject queryResults = data.optJSONObject("query");
