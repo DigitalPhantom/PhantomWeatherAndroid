@@ -31,7 +31,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -51,6 +50,8 @@ import android.widget.Toast;
 import net.digitalphantom.app.weatherapp.data.Channel;
 import net.digitalphantom.app.weatherapp.data.Condition;
 import net.digitalphantom.app.weatherapp.data.LocationResult;
+import net.digitalphantom.app.weatherapp.data.Units;
+import net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment;
 import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener;
 import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener;
 import net.digitalphantom.app.weatherapp.service.WeatherCacheService;
@@ -84,8 +85,8 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
 
         weatherIconImageView = (ImageView) findViewById(R.id.weatherIconImageView);
         temperatureTextView = (TextView) findViewById(R.id.temperatureTextView);
-        conditionTextView = (TextView) findViewById(R.id.conditionTextView);
-        locationTextView = (TextView) findViewById(R.id.locationTextView);
+        conditionTextView = (TextView) findViewById(R.id.highTemperatureTextView);
+        locationTextView = (TextView) findViewById(R.id.lowTemperatureTextView);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -207,19 +208,30 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
         loadingDialog.hide();
 
         Condition condition = channel.getItem().getCondition();
+        Units units = channel.getUnits();
+        Condition[] forecast = channel.getItem().getForecast();
 
-        int resourceId = getResources().getIdentifier("drawable/icon_" + condition.getCode(), null, getPackageName());
+        int weatherIconImageResource = getResources().getIdentifier("icon_" + condition.getCode(), "drawable", getPackageName());
 
-        @SuppressWarnings("deprecation")
-        Drawable weatherIconDrawable = getResources().getDrawable(resourceId);
-
-        weatherIconImageView.setImageDrawable(weatherIconDrawable);
-
-        String temperatureLabel = getString(R.string.temperature_output, condition.getTemperature(), channel.getUnits().getTemperature());
-
-        temperatureTextView.setText(temperatureLabel);
+        weatherIconImageView.setImageResource(weatherIconImageResource);
+        temperatureTextView.setText(getString(R.string.temperature_output, condition.getTemperature(), units.getTemperature()));
         conditionTextView.setText(condition.getDescription());
         locationTextView.setText(channel.getLocation());
+
+        for (int day = 0; day < forecast.length; day++) {
+            if (day >= 5) {
+                break;
+            }
+
+            Condition currentCondition = forecast[day];
+
+            int viewId = getResources().getIdentifier("forecast_" + day, "id", getPackageName());
+            WeatherConditionFragment fragment = (WeatherConditionFragment) getSupportFragmentManager().findFragmentById(viewId);
+
+            if (fragment != null) {
+                fragment.loadForecast(currentCondition, channel.getUnits());
+            }
+        }
     }
 
     @Override

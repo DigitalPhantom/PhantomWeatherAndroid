@@ -22,20 +22,5 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <resources>
-    <string name="app_name">Phantom Weather</string>
-    <string name="temperature">Temperature</string>
-    <string name="condition">Condition</string>
-    <string name="location">Location</string>
-    <string name="powered_by_yahoo">powered by Yahoo!</string>
-    <string name="condition_icon">Condition Icon</string>
-    <string name="loading">Loading&#8230;</string>
-    <string name="temperature_output">%1$d&#176;%2$s</string>
-    <string name="update_location">Update Location</string>
-    <string name="settings">Settings</string>
-    <string name="cache_exception">No Cached Weather Data</string>
-    <string name="location_permission_needed">Device location is needed for Weather GeoLocation</string>
-    <string name="disable_geolocation">Change Settings</string>
-    <string name="day">Day</string>
-    <string name="high">High</string>
-    <string name="low">Low</string>
+    <color name="light_text">#bcbcbc</color>
 </resources>
