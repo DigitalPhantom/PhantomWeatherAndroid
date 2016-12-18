@@ -47,7 +47,7 @@ public class YahooWeatherService {
         this.listener = listener;
     }
 
-    public String getTemperatureUnit() {
+    private String getTemperatureUnit() {
         return temperatureUnit;
     }
 
@@ -86,6 +86,8 @@ public class YahooWeatherService {
                         result.append(line);
                     }
 
+                    reader.close();
+
                     JSONObject data = new JSONObject(result.toString());
 
                     JSONObject queryResults = data.optJSONObject("query");
@@ -123,8 +125,8 @@ public class YahooWeatherService {
         }.execute(location);
     }
 
-    public class LocationWeatherException extends Exception {
-        public LocationWeatherException(String detailMessage) {
+    private class LocationWeatherException extends Exception {
+        LocationWeatherException(String detailMessage) {
             super(detailMessage);
         }
     }

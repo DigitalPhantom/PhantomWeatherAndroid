@@ -53,7 +53,7 @@ THE SOFTWARE.
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/condition"
-        android:id="@+id/conditionTextView"
+        android:id="@+id/highTemperatureTextView"
         android:layout_below="@+id/temperatureTextView"
         android:layout_centerHorizontal="true" />
 
@@ -62,8 +62,8 @@ THE SOFTWARE.
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/location"
-        android:id="@+id/locationTextView"
-        android:layout_below="@+id/conditionTextView"
+        android:id="@+id/lowTemperatureTextView"
+        android:layout_below="@+id/highTemperatureTextView"
         android:layout_centerHorizontal="true"
         android:textStyle="bold" />
 
@@ -75,4 +75,63 @@ THE SOFTWARE.
         android:layout_centerHorizontal="true"
         android:id="@+id/imageView"
         android:contentDescription="@string/powered_by_yahoo" />
+
+    <LinearLayout
+        android:id="@+id/forecastContainer"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/lowTemperatureTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="34dp"
+        android:layout_above="@+id/imageView">
+        <fragment
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:id="@+id/forecast_0"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition" />
+        <fragment
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:id="@+id/forecast_1"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition" />
+        <fragment
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:id="@+id/forecast_2"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition" />
+        <fragment
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:id="@+id/forecast_3"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition" />
+        <fragment
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:id="@+id/forecast_4"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/lowTemperatureTextView"
+        android:layout_centerHorizontal="true">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical" />
+    </HorizontalScrollView>
+
 </RelativeLayout>
