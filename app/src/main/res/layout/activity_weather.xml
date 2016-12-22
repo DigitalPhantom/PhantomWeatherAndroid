@@ -53,7 +53,7 @@ THE SOFTWARE.
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/condition"
-        android:id="@+id/highTemperatureTextView"
+        android:id="@+id/conditionTextView"
         android:layout_below="@+id/temperatureTextView"
         android:layout_centerHorizontal="true" />
 
@@ -62,8 +62,8 @@ THE SOFTWARE.
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="@string/location"
-        android:id="@+id/lowTemperatureTextView"
-        android:layout_below="@+id/highTemperatureTextView"
+        android:id="@+id/locationTextView"
+        android:layout_below="@+id/conditionTextView"
         android:layout_centerHorizontal="true"
         android:textStyle="bold" />
 
@@ -81,10 +81,11 @@ THE SOFTWARE.
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/lowTemperatureTextView"
+        android:layout_below="@+id/locationTextView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="34dp"
-        android:layout_above="@+id/imageView">
+        android:layout_above="@+id/imageView"
+        android:baselineAligned="false">
         <fragment
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -121,17 +122,5 @@ THE SOFTWARE.
             android:layout_weight="1"
             tools:layout="@layout/fragment_weather_condition" />
     </LinearLayout>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/lowTemperatureTextView"
-        android:layout_centerHorizontal="true">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
-    </HorizontalScrollView>
 
 </RelativeLayout>

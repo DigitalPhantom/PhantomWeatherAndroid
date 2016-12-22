@@ -60,7 +60,7 @@ public class WeatherCacheService {
                     outputStream.close();
 
                 } catch (IOException e) {
-                    // TODO: file save operation failed
+                    e.printStackTrace();
                 }
 
                 return null;
@@ -114,8 +114,8 @@ public class WeatherCacheService {
         }.execute(listener);
     }
 
-    public class CacheException extends Exception {
-        public CacheException(String detailMessage) {
+    private class CacheException extends Exception {
+        CacheException(String detailMessage) {
             super(detailMessage);
         }
     }

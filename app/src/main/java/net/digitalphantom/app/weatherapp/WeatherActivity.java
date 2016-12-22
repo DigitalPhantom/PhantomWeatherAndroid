@@ -85,8 +85,8 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
 
         weatherIconImageView = (ImageView) findViewById(R.id.weatherIconImageView);
         temperatureTextView = (TextView) findViewById(R.id.temperatureTextView);
-        conditionTextView = (TextView) findViewById(R.id.highTemperatureTextView);
-        locationTextView = (TextView) findViewById(R.id.lowTemperatureTextView);
+        conditionTextView = (TextView) findViewById(R.id.conditionTextView);
+        locationTextView = (TextView) findViewById(R.id.locationTextView);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -232,6 +232,8 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
                 fragment.loadForecast(currentCondition, channel.getUnits());
             }
         }
+
+        cacheService.save(channel);
     }
 
     @Override

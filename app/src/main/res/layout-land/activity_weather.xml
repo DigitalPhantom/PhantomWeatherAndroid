@@ -1,0 +1,169 @@
+<!--
+The MIT License (MIT)
+
+Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/weatherIconImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/condition_icon"
+                android:src="@drawable/icon_na"
+                android:adjustViewBounds="true"
+                android:cropToPadding="false"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/temperatureTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/temperature"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:gravity="bottom|center_horizontal"
+                    android:layout_weight="1"
+                    android:typeface="serif" />
+
+                <TextView
+                    android:id="@+id/conditionTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/condition"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textAlignment="center"
+                    android:gravity="center_horizontal" />
+
+                <TextView
+                    android:id="@+id/locationTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textAlignment="center"
+                    android:gravity="top|center_horizontal" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/powered_by_yahoo"
+                android:src="@drawable/yahoo_logo"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="40dp"
+        android:paddingRight="40dp"
+        android:baselineAligned="false">
+
+        <fragment
+            android:id="@+id/forecast_0"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <fragment
+            android:id="@+id/forecast_1"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <fragment
+            android:id="@+id/forecast_2"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <fragment
+            android:id="@+id/forecast_3"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+
+        <fragment
+            android:id="@+id/forecast_4"
+            android:name="net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:layout="@layout/fragment_weather_condition"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
+    </LinearLayout>
+
+</LinearLayout>
