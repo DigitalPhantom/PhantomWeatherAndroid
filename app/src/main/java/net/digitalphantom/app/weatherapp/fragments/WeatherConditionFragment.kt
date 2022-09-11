@@ -24,59 +24,34 @@
  */
 package net.digitalphantom.app.weatherapp.fragments
 
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
-import org.json.JSONObject
-import org.json.JSONArray
-import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
 import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
 import android.os.Bundle
-import android.preference.PreferenceManager
-import android.content.Intent
-import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import net.digitalphantom.app.weatherapp.data.Condition
 import net.digitalphantom.app.weatherapp.data.Units
+import net.digitalphantom.app.weatherapp.databinding.FragmentWeatherConditionBinding
 
 class WeatherConditionFragment : Fragment() {
-    private var weatherIconImageView: ImageView? = null
-    private var dayLabelTextView: TextView? = null
-    private var highTemperatureTextView: TextView? = null
-    private var lowTemperatureTextView: TextView? = null
+    private var _binding: FragmentWeatherConditionBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_weather_condition, container, false)
-        weatherIconImageView = view.findViewById<View>(R.id.weatherIconImageView) as ImageView
-        dayLabelTextView = view.findViewById<View>(R.id.dayTextView) as TextView
-        highTemperatureTextView = view.findViewById<View>(R.id.highTemperatureTextView) as TextView
-        lowTemperatureTextView = view.findViewById<View>(R.id.lowTemperatureTextView) as TextView
-        return view
+        _binding = FragmentWeatherConditionBinding.inflate(inflater, container, false)
+
+        return binding.root
     }
 
     fun loadForecast(forecast: Condition, units: Units) {
-        val weatherIconImageResource = resources.getIdentifier("icon_" + forecast.code, "drawable", activity!!.packageName)
-        weatherIconImageView!!.setImageResource(weatherIconImageResource)
-        dayLabelTextView.setText(forecast.day)
-        highTemperatureTextView!!.text = getString(R.string.temperature_output, forecast.highTemperature, units.temperature)
-        lowTemperatureTextView!!.text = getString(R.string.temperature_output, forecast.lowTemperature, units.temperature)
+        val weatherIconImageResource = resources.getIdentifier("icon_" + forecast.code, "drawable", requireActivity().packageName)
+
+        binding.apply {
+            weatherIconImageView.setImageResource(weatherIconImageResource)
+            dayTextView.text = forecast.day
+            highTemperatureTextView.text = getString(R.string.temperature_output, forecast.highTemperature, units.temperature)
+            lowTemperatureTextView.text = getString(R.string.temperature_output, forecast.lowTemperature, units.temperature)
+        }
     }
 }

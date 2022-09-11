@@ -25,94 +25,49 @@
 package net.digitalphantom.app.weatherapp.service
 
 import android.content.Context
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
 import org.json.JSONObject
-import org.json.JSONArray
-import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
+import kotlinx.coroutines.*
 import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
-import android.os.Bundle
-import android.preference.PreferenceManager
-import android.content.Intent
-import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import net.digitalphantom.app.weatherapp.data.Channel
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
-import java.lang.Exception
 import java.lang.StringBuilder
 
-class WeatherCacheService(private val context: Context) {
-    private var error: Exception? = null
+class WeatherCacheService() {
     private val CACHED_WEATHER_FILE = "weather.data"
-    fun save(channel: Channel?) {
-        object : AsyncTask<Channel, Void?, Void?>() {
-            override fun doInBackground(channels: Array<Channel>): Void? {
-                val outputStream: FileOutputStream
-                try {
-                    outputStream = context.openFileOutput(CACHED_WEATHER_FILE, Context.MODE_PRIVATE)
-                    outputStream.write(channels[0].toJSON().toString().toByteArray())
-                    outputStream.close()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-                return null
-            }
-        }.execute(channel)
+
+    suspend fun save(channel: Channel?, context: Context) = withContext(Dispatchers.IO) {
+        val outputStream: FileOutputStream
+        try {
+            outputStream = context.openFileOutput(CACHED_WEATHER_FILE, Context.MODE_PRIVATE)
+            outputStream.write(channel?.toJSON().toString().toByteArray())
+            outputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
-    fun load(listener: WeatherServiceListener?) {
-        object : AsyncTask<WeatherServiceListener?, Void?, Channel?>() {
-            private var weatherListener: WeatherServiceListener? = null
-            override fun doInBackground(serviceListeners: Array<WeatherServiceListener?>): Channel? {
-                weatherListener = serviceListeners[0]
-                try {
-                    val inputStream = context.openFileInput(CACHED_WEATHER_FILE)
-                    val cache = StringBuilder()
-                    var content: Int
-                    while (inputStream.read().also { content = it } != -1) {
-                        cache.append(content.toChar())
-                    }
-                    inputStream.close()
-                    val jsonCache = JSONObject(cache.toString())
-                    val channel = Channel()
-                    channel.populate(jsonCache)
-                    return channel
-                } catch (e: FileNotFoundException) { // cache file doesn't exist
-                    error = CacheException(context.getString(R.string.cache_exception))
-                } catch (e: Exception) {
-                    error = e
-                }
-                return null
+    suspend fun load(context: Context): Result<Channel> = withContext(Dispatchers.IO) {
+        try {
+            val inputStream = context.openFileInput(CACHED_WEATHER_FILE)
+            val cache = StringBuilder()
+            var content: Int
+            while (inputStream.read().also { content = it } != -1) {
+                cache.append(content.toChar())
+            }
+            inputStream.close()
+            val jsonCache = JSONObject(cache.toString())
+
+            val chanel = Channel().apply {
+                populate(jsonCache)
             }
 
-            override fun onPostExecute(channel: Channel?) {
-                if (channel == null && error != null) {
-                    weatherListener!!.serviceFailure(error)
-                } else {
-                    weatherListener!!.serviceSuccess(channel)
-                }
-            }
-        }.execute(listener)
+            return@withContext Result.success(chanel)
+        } catch (e: FileNotFoundException) { // cache file doesn't exist
+            throw CacheException(context.getString(R.string.cache_exception))
+        }
     }
 
-    private inner class CacheException internal constructor(detailMessage: String?) : Exception(detailMessage)
+    private inner class CacheException(detailMessage: String?) : Exception(detailMessage)
 }

@@ -24,41 +24,14 @@
  */
 package net.digitalphantom.app.weatherapp.data
 
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
 import org.json.JSONObject
-import org.json.JSONArray
 import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
-import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
-import android.os.Bundle
-import android.preference.PreferenceManager
-import android.content.Intent
-import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
-import android.view.LayoutInflater
-import android.view.ViewGroup
 
 class LocationResult : JSONPopulator {
     var address: String? = null
-        private set
 
-    override fun populate(data: JSONObject) {
-        address = data.optString("formatted_address")
+    override fun populate(data: JSONObject?) {
+        address = data?.optString("formatted_address")
     }
 
     override fun toJSON(): JSONObject {
@@ -66,7 +39,9 @@ class LocationResult : JSONPopulator {
         try {
             data.put("formatted_address", address)
         } catch (e: JSONException) {
+            e.printStackTrace()
         }
+
         return data
     }
 }

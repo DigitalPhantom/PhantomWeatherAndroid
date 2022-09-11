@@ -24,55 +24,43 @@
  */
 package net.digitalphantom.app.weatherapp.fragments
 
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
-import org.json.JSONObject
-import org.json.JSONArray
-import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
 import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.content.Intent
 import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
-import android.view.LayoutInflater
 import android.view.MenuItem
-import android.view.ViewGroup
+import androidx.preference.EditTextPreference
+import androidx.preference.Preference
+import androidx.preference.Preference.OnPreferenceChangeListener
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 
-class SettingsFragment : PreferenceFragment(), OnPreferenceChangeListener, OnSharedPreferenceChangeListener {
-    private var preferences: SharedPreferences? = null
-    private var geolocationEnabledPreference: SwitchPreference? = null
-    private var manualLocationPreference: EditTextPreference? = null
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        addPreferencesFromResource(R.xml.app_preferences)
-        preferences = PreferenceManager.getDefaultSharedPreferences(activity)
-        geolocationEnabledPreference = findPreference(getString(R.string.pref_geolocation_enabled)) as SwitchPreference
-        manualLocationPreference = findPreference(getString(R.string.pref_manual_location)) as EditTextPreference
+class SettingsFragment : PreferenceFragmentCompat(), OnPreferenceChangeListener, OnSharedPreferenceChangeListener {
+    private lateinit var preferences: SharedPreferences
+    private lateinit var geolocationEnabledPreference: SwitchPreferenceCompat
+    private lateinit var manualLocationPreference: EditTextPreference
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.app_preferences, rootKey)
+
+        preferences = preferenceManager.sharedPreferences!!
+        preferences.registerOnSharedPreferenceChangeListener(this)
+
+        geolocationEnabledPreference = findPreference(getString(R.string.pref_geolocation_enabled))!!
+        manualLocationPreference = findPreference(getString(R.string.pref_manual_location))!!
+
         bindPreferenceSummaryToValue(manualLocationPreference)
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_temperature_unit)))
-        PreferenceManager.getDefaultSharedPreferences(activity).registerOnSharedPreferenceChangeListener(this)
-        onSharedPreferenceChanged(null, null)
+
         if (!preferences.getBoolean(getString(R.string.pref_needs_setup), false)) {
             val editor = preferences.edit()
             editor.putBoolean(getString(R.string.pref_needs_setup), false)
             editor.apply()
         }
+
+        onSharedPreferenceChanged(preferences, geolocationEnabledPreference.key)
         setHasOptionsMenu(true)
     }
 
@@ -85,26 +73,31 @@ class SettingsFragment : PreferenceFragment(), OnPreferenceChangeListener, OnSha
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, s: String) {
-        if (geolocationEnabledPreference!!.isChecked) {
-            manualLocationPreference!!.isEnabled = false
-        } else {
-            manualLocationPreference!!.isEnabled = true
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, preferenceKey: String) {
+        if (preferenceKey == geolocationEnabledPreference.key) {
+            manualLocationPreference.isEnabled = geolocationEnabledPreference.isChecked == false
         }
     }
 
-    private fun bindPreferenceSummaryToValue(preference: Preference?) {
-        preference!!.onPreferenceChangeListener = this
-        onPreferenceChange(preference, preferences!!.getString(preference.key, null)!!)
+    private fun bindPreferenceSummaryToValue(preference: androidx.preference.Preference?) = preference?.apply {
+        onPreferenceChangeListener = this@SettingsFragment
+        onPreferenceChange(preference, preferences.getString(preference.key, null)!!)
     }
 
-    override fun onPreferenceChange(preference: Preference, value: Any): Boolean {
+    override fun onPreferenceChange(preference: Preference, value: Any?): Boolean {
         val stringValue = value.toString()
-        if (preference is ListPreference) {
-            val listPreference = preference
-            val index = listPreference.findIndexOfValue(stringValue)
-            preference.setSummary(if (index >= 0) listPreference.entries[index] else null)
-        } else (preference as? EditTextPreference)?.summary = stringValue
+
+        when (preference) {
+            is androidx.preference.ListPreference -> {
+                val index = preference.findIndexOfValue(stringValue)
+                preference.summary = if (index >= 0) preference.entries[index] else null
+            }
+            is EditTextPreference -> {
+                preference.summary = stringValue
+            }
+        }
+
         return true
     }
 }

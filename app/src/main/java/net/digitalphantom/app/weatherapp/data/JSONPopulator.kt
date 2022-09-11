@@ -27,6 +27,6 @@ package net.digitalphantom.app.weatherapp.data
 import org.json.JSONObject
 
 interface JSONPopulator {
-    fun populate(data: JSONObject)
+    fun populate(data: JSONObject?)
     fun toJSON(): JSONObject
 }

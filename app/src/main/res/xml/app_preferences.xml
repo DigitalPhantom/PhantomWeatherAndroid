@@ -22,20 +22,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:defaultValue="true"
         android:id="@+id/geolocation_enabled"
         android:key="@string/pref_geolocation_enabled"
         android:summary="@string/pref_description_enable_geolocation"
         android:title="@string/pref_title_enable_geolocation" />
     <EditTextPreference
-        android:capitalize="words"
         android:defaultValue="@string/pref_default_location"
         android:inputType="textCapWords"
         android:key="@string/pref_manual_location"
-        android:maxLines="1"
-        android:selectAllOnFocus="true"
-        android:singleLine="true"
         android:title="@string/pref_title_manual_location" />
     <ListPreference
         android:defaultValue="@string/pref_default_unit"

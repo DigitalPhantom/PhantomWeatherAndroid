@@ -27,6 +27,6 @@ package net.digitalphantom.app.weatherapp.listener
 import net.digitalphantom.app.weatherapp.data.LocationResult
 
 interface GeocodingServiceListener {
-    fun geocodeSuccess(location: LocationResult?)
-    fun geocodeFailure(exception: Exception?)
+    fun geocodeSuccess(location: LocationResult?): Unit?
+    fun geocodeFailure(exception: Exception?): Unit?
 }

@@ -24,60 +24,38 @@
  */
 package net.digitalphantom.app.weatherapp.data
 
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
 import org.json.JSONObject
 import org.json.JSONArray
 import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
-import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
-import android.os.Bundle
-import android.preference.PreferenceManager
-import android.content.Intent
-import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
-import android.view.LayoutInflater
-import android.view.ViewGroup
 
 class Item : JSONPopulator {
     var condition: Condition? = null
-        private set
-    var forecast: Array<Condition?>
-        private set
+    var forecast: List<Condition>? = null
 
-    override fun populate(data: JSONObject) {
-        condition = Condition()
-        condition!!.populate(data.optJSONObject("condition"))
-        val forecastData = data.optJSONArray("forecast")
-        forecast = arrayOfNulls(forecastData.length())
-        for (i in 0 until forecastData.length()) {
-            forecast[i] = Condition()
-            try {
-                forecast[i]!!.populate(forecastData.getJSONObject(i))
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
+    override fun populate(data: JSONObject?) {
+        condition = Condition().apply {
+            populate(data?.optJSONObject("condition"))
         }
+
+        forecast = mutableListOf<Condition>().apply {
+            val forecastData = data?.optJSONArray("forecast")
+            val forecastCount = forecastData?.length() ?: 0
+
+            for (i in 0 until forecastCount) {
+                try {
+                    add(Condition().apply { populate(forecastData?.getJSONObject(i)) })
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
+            }
+
+        }.toList()
     }
 
     override fun toJSON(): JSONObject {
         val data = JSONObject()
         try {
-            data.put("condition", condition!!.toJSON())
+            data.put("condition", condition?.toJSON())
             data.put("forecast", JSONArray(forecast))
         } catch (e: JSONException) {
             e.printStackTrace()

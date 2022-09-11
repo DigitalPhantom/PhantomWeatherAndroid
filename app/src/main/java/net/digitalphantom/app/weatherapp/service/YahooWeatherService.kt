@@ -24,35 +24,10 @@
  */
 package net.digitalphantom.app.weatherapp.service
 
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
 import org.json.JSONObject
-import org.json.JSONArray
-import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
-import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
-import android.os.Bundle
-import android.preference.PreferenceManager
-import android.content.Intent
 import android.net.Uri
-import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.digitalphantom.app.weatherapp.data.Channel
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -60,56 +35,43 @@ import java.lang.Exception
 import java.lang.StringBuilder
 import java.net.URL
 
-class YahooWeatherService(private val listener: WeatherServiceListener) {
-    private var error: Exception? = null
-    private var temperatureUnit = "C"
-        set
+class YahooWeatherService() {
+    var temperatureUnit = "C"
 
-    fun refreshWeather(location: String?) {
-        object : AsyncTask<String, Void?, Channel?>() {
-            override fun doInBackground(locations: Array<String>): Channel? {
-                val location = locations[0]
-                val channel = Channel()
-                val unit = if (temperatureUnit.equals("f", ignoreCase = true)) "f" else "c"
-                val YQL = String.format("select * from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"%s\") and u='$unit'", location)
-                val endpoint = String.format("https://query.yahooapis.com/v1/public/yql?q=%s&format=json", Uri.encode(YQL))
-                try {
-                    val url = URL(endpoint)
-                    val connection = url.openConnection()
-                    connection.useCaches = false
-                    val inputStream = connection.getInputStream()
-                    val reader = BufferedReader(InputStreamReader(inputStream))
-                    val result = StringBuilder()
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        result.append(line)
-                    }
-                    reader.close()
-                    val data = JSONObject(result.toString())
-                    val queryResults = data.optJSONObject("query")
-                    val count = queryResults.optInt("count")
-                    if (count == 0) {
-                        error = LocationWeatherException("No weather information found for $location")
-                        return null
-                    }
-                    val channelJSON = queryResults.optJSONObject("results").optJSONObject("channel")
-                    channel.populate(channelJSON)
-                    return channel
-                } catch (e: Exception) {
-                    error = e
-                }
-                return null
+    suspend fun refreshWeather(location: String?): Result<Channel> = withContext(Dispatchers.Default) {
+        val channel = Channel()
+        val unit = if (temperatureUnit.equals("f", ignoreCase = true)) "f" else "c"
+        val YQL = String.format("select * from weather.forecast where woeid in (select woeid from geo.places(1) where text=\"%s\") and u='$unit'", location)
+        val endpoint = String.format("https://query.yahooapis.com/v1/public/yql?q=%s&format=json", Uri.encode(YQL))
+
+        val url = URL(endpoint)
+
+        url.openConnection()?.run {
+            useCaches = false
+
+            val reader = BufferedReader(InputStreamReader(inputStream))
+            val result = StringBuilder()
+            var line: String?
+            while (reader.readLine().also { line = it } != null) {
+                result.append(line)
             }
 
-            override fun onPostExecute(channel: Channel?) {
-                if (channel == null && error != null) {
-                    listener.serviceFailure(error)
-                } else {
-                    listener.serviceSuccess(channel)
-                }
+            val data = JSONObject(result.toString())
+            val queryResults = data.optJSONObject("query")
+            val count = queryResults.optInt("count")
+
+            if (count == 0) {
+                throw LocationWeatherException("No weather information found for $location")
             }
-        }.execute(location)
+
+            val channelJSON = queryResults.optJSONObject("results").optJSONObject("channel")
+            channel.populate(channelJSON)
+
+            return@withContext Result.success(channel)
+        }
+
+        throw LocationWeatherException("No weather information found for $location")
     }
 
-    private inner class LocationWeatherException internal constructor(detailMessage: String?) : Exception(detailMessage)
+    private inner class LocationWeatherException(detailMessage: String?) : Exception(detailMessage)
 }

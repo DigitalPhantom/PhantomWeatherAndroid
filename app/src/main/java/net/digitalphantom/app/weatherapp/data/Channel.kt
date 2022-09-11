@@ -24,52 +24,28 @@
  */
 package net.digitalphantom.app.weatherapp.data
 
-import net.digitalphantom.app.weatherapp.data.JSONPopulator
 import org.json.JSONObject
-import org.json.JSONArray
 import org.json.JSONException
-import android.os.AsyncTask
-import net.digitalphantom.app.weatherapp.listener.WeatherServiceListener
-import net.digitalphantom.app.weatherapp.service.WeatherCacheService.CacheException
-import net.digitalphantom.app.weatherapp.R
-import net.digitalphantom.app.weatherapp.service.YahooWeatherService.LocationWeatherException
-import net.digitalphantom.app.weatherapp.listener.GeocodingServiceListener
-import net.digitalphantom.app.weatherapp.data.LocationResult
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService
-import net.digitalphantom.app.weatherapp.service.GoogleMapsGeocodingService.ReverseGeolocationException
-import android.preference.PreferenceFragment
-import android.preference.Preference.OnPreferenceChangeListener
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.content.SharedPreferences
-import android.preference.SwitchPreference
-import android.preference.EditTextPreference
-import android.os.Bundle
-import android.preference.PreferenceManager
-import android.content.Intent
-import net.digitalphantom.app.weatherapp.WeatherActivity
-import android.preference.Preference
-import android.preference.ListPreference
-import android.widget.TextView
-import android.view.LayoutInflater
-import android.view.ViewGroup
 
 class Channel : JSONPopulator {
     var units: Units? = null
-        private set
     var item: Item? = null
-        private set
     var location: String? = null
-        private set
 
-    override fun populate(data: JSONObject) {
-        units = Units()
-        units!!.populate(data.optJSONObject("units"))
-        item = Item()
-        item!!.populate(data.optJSONObject("item"))
-        val locationData = data.optJSONObject("location")
-        val region = locationData.optString("region")
-        val country = locationData.optString("country")
-        location = String.format("%s, %s", locationData.optString("city"), if (region.length != 0) region else country)
+    override fun populate(data: JSONObject?) {
+        units = Units().apply {
+            populate(data?.optJSONObject("units"))
+        }
+        item = Item().apply {
+            populate(data?.optJSONObject("item"))
+        }
+
+        data?.optJSONObject("location")?.apply {
+            val region = optString("region")
+            val country = optString("country")
+
+            location = String.format("%s, %s", optString("city"), region.ifEmpty { country })
+        }
     }
 
     override fun toJSON(): JSONObject {

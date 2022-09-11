@@ -36,28 +36,24 @@ import net.digitalphantom.app.weatherapp.service.WeatherCacheService
 import android.app.ProgressDialog
 import android.content.SharedPreferences
 import android.os.Bundle
-import net.digitalphantom.app.weatherapp.R
 import android.preference.PreferenceManager
 import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import net.digitalphantom.app.weatherapp.WeatherActivity
 import android.location.LocationManager
 import android.location.Criteria
-import android.content.DialogInterface
-import android.view.MenuInflater
 import android.content.Intent
 import android.location.Location
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import net.digitalphantom.app.weatherapp.SettingsActivity
 import net.digitalphantom.app.weatherapp.fragments.WeatherConditionFragment
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import net.digitalphantom.app.weatherapp.data.Channel
 import net.digitalphantom.app.weatherapp.data.LocationResult
-import java.lang.Exception
+import net.digitalphantom.app.weatherapp.viewmodel.MainViewModel
 
 class WeatherActivity : AppCompatActivity(), WeatherServiceListener, GeocodingServiceListener, LocationListener {
     private var weatherIconImageView: ImageView? = null
@@ -69,8 +65,8 @@ class WeatherActivity : AppCompatActivity(), WeatherServiceListener, GeocodingSe
     private var cacheService: WeatherCacheService? = null
     private var loadingDialog: ProgressDialog? = null
 
-    // weather service fail flag
-    private var weatherServicesHasFailed = false
+    private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
+
     private var preferences: SharedPreferences? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,11 +76,13 @@ class WeatherActivity : AppCompatActivity(), WeatherServiceListener, GeocodingSe
         conditionTextView = findViewById<View>(R.id.conditionTextView) as TextView
         locationTextView = findViewById<View>(R.id.locationTextView) as TextView
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        weatherService = YahooWeatherService(this)
-        weatherService!!.setTemperatureUnit(preferences.getString(getString(R.string.pref_temperature_unit), null))
-        geocodingService = GoogleMapsGeocodingService(this)
-        cacheService = WeatherCacheService(this)
-        if (preferences.getBoolean(getString(R.string.pref_needs_setup), true)) {
+        weatherService = YahooWeatherService()
+        preferences!!.getString(getString(R.string.pref_temperature_unit), null)?.let {
+            weatherService!!.temperatureUnit = it
+        }
+        geocodingService = GoogleMapsGeocodingService()
+        cacheService = WeatherCacheService()
+        if (preferences!!.getBoolean(getString(R.string.pref_needs_setup), true)) {
             startSettingsActivity()
         }
     }
@@ -106,14 +104,13 @@ class WeatherActivity : AppCompatActivity(), WeatherServiceListener, GeocodingSe
         } else {
             location = preferences!!.getString(getString(R.string.pref_manual_location), null)
         }
-        if (location != null) {
-            weatherService!!.refreshWeather(location)
-        }
+
+        viewModel.refreshWeather(location, this)
     }
 
     // system's LocationManager
     private val weatherFromCurrentLocation: Unit
-        private get() {
+        get() {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, arrayOf(
                         Manifest.permission.ACCESS_FINE_LOCATION), GET_WEATHER_FROM_CURRENT_LOCATION)
@@ -134,6 +131,7 @@ class WeatherActivity : AppCompatActivity(), WeatherServiceListener, GeocodingSe
         }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == GET_WEATHER_FROM_CURRENT_LOCATION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 weatherFromCurrentLocation
@@ -174,57 +172,59 @@ class WeatherActivity : AppCompatActivity(), WeatherServiceListener, GeocodingSe
         }
     }
 
-    override fun serviceSuccess(channel: Channel) {
+    override fun serviceSuccess(channel: Channel?) {
         loadingDialog!!.hide()
-        val condition = channel.item.condition
+        if (channel == null) return
+        if (channel.item == null) return
+        if (channel.units == null) return
+
+        val condition = channel.item?.condition ?: return
         val units = channel.units
-        val forecast = channel.item.forecast
+        val forecast = channel.item!!.forecast
         val weatherIconImageResource = resources.getIdentifier("icon_" + condition.code, "drawable", packageName)
         weatherIconImageView!!.setImageResource(weatherIconImageResource)
-        temperatureTextView!!.text = getString(R.string.temperature_output, condition.temperature, units.temperature)
+        temperatureTextView!!.text = getString(R.string.temperature_output, condition.temperature, units?.temperature)
         conditionTextView!!.text = condition.description
         locationTextView!!.text = channel.location
-        for (day in forecast.indices) {
-            if (day >= 5) {
-                break
+
+        forecast?.indices?.let { forecastList ->
+            for (day in forecastList) {
+                if (day >= 5) {
+                    break
+                }
+                val currentCondition = forecast[day]
+                val viewId = resources.getIdentifier("forecast_$day", "id", packageName)
+                val fragment = supportFragmentManager.findFragmentById(viewId) as WeatherConditionFragment?
+
+                fragment?.loadForecast(currentCondition, channel.units!!)
             }
-            val currentCondition = forecast[day]
-            val viewId = resources.getIdentifier("forecast_$day", "id", packageName)
-            val fragment = supportFragmentManager.findFragmentById(viewId) as WeatherConditionFragment?
-            fragment?.loadForecast(currentCondition, channel.units)
         }
-        cacheService!!.save(channel)
+
+        viewModel.cacheWeather(baseContext, channel)
     }
 
-    override fun serviceFailure(exception: Exception) {
-        // display error if this is the second failure
-        if (weatherServicesHasFailed) {
-            loadingDialog!!.hide()
-            Toast.makeText(this, exception.message, Toast.LENGTH_LONG).show()
-        } else {
-            // error doing reverse geocoding, load weather data from cache
-            weatherServicesHasFailed = true
-            // OPTIONAL: let the user know an error has occurred then fallback to the cached data
-            Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
-            cacheService!!.load(this)
+    override fun serviceFailure(exception: Exception?) {
+        loadingDialog?.hide()
+
+        exception?.let { error ->
+            Toast.makeText(this@WeatherActivity, error.message.orEmpty(), Toast.LENGTH_LONG).show()
         }
     }
 
-    override fun geocodeSuccess(location: LocationResult) {
-        // completed geocoding successfully
-        weatherService!!.refreshWeather(location.address)
+    override fun geocodeSuccess(location: LocationResult?) = location?.let { place ->
+        viewModel.refreshWeather(place.address, this)
+
         val editor = preferences!!.edit()
-        editor.putString(getString(R.string.pref_cached_location), location.address)
+        editor.putString(getString(R.string.pref_cached_location), place.address)
         editor.apply()
     }
 
-    override fun geocodeFailure(exception: Exception) {
-        // GeoCoding failed, try loading weather data from the cache
-        cacheService!!.load(this)
+    override fun geocodeFailure(exception: Exception?) {
+        viewModel.loadFromCache(baseContext, this)
     }
 
     override fun onLocationChanged(location: Location) {
-        geocodingService!!.refreshLocation(location)
+        viewModel.refreshLocation(location, this)
     }
 
     override fun onStatusChanged(s: String, i: Int, bundle: Bundle) {
