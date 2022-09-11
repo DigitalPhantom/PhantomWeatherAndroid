@@ -17,6 +17,8 @@ android {
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
+
+        buildConfigField "String", "GoogleMapsApiKey", apiKeys.getProperty("GOOGLE_MAPS_API_KEY", "\"\"")
     }
     buildFeatures {
         viewBinding true
