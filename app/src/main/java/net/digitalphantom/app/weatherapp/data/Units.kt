@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
+ * Copyright (c) 2015 - 2022 Yoel Nunez <dev@nunez.guru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,25 @@
  * THE SOFTWARE.
  *
  */
-package net.digitalphantom.app.weatherapp.data;
+package net.digitalphantom.app.weatherapp.data
 
-import org.json.JSONObject;
+import org.json.JSONObject
+import org.json.JSONException
 
-public interface JSONPopulator {
-    void populate(JSONObject data);
+class Units : JSONPopulator {
+    var temperature: String? = null
 
-    JSONObject toJSON();
+    override fun populate(data: JSONObject?) {
+        temperature = data?.optString("temperature")
+    }
+
+    override fun toJSON(): JSONObject {
+        val data = JSONObject()
+        try {
+            data.put("temperature", temperature)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+        return data
+    }
 }

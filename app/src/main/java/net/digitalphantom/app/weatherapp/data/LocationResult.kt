@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
+ * Copyright (c) 2015 - 2022 Yoel Nunez <dev@nunez.guru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,26 @@
  * THE SOFTWARE.
  *
  */
-package net.digitalphantom.app.weatherapp.listener;
+package net.digitalphantom.app.weatherapp.data
 
-import net.digitalphantom.app.weatherapp.data.LocationResult;
+import org.json.JSONObject
+import org.json.JSONException
 
-public interface GeocodingServiceListener {
-    void geocodeSuccess(LocationResult location);
+class LocationResult : JSONPopulator {
+    var address: String? = null
 
-    void geocodeFailure(Exception exception);
+    override fun populate(data: JSONObject?) {
+        address = data?.optString("formatted_address")
+    }
+
+    override fun toJSON(): JSONObject {
+        val data = JSONObject()
+        try {
+            data.put("formatted_address", address)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+
+        return data
+    }
 }

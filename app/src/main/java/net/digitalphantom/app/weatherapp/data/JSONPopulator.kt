@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
+ * Copyright (c) 2015 - 2022 Yoel Nunez <dev@nunez.guru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,32 +22,11 @@
  * THE SOFTWARE.
  *
  */
-package net.digitalphantom.app.weatherapp.data;
+package net.digitalphantom.app.weatherapp.data
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.JSONObject
 
-public class LocationResult implements JSONPopulator {
-
-    private String address;
-
-    public String getAddress() {
-        return address;
-    }
-
-    @Override
-    public void populate(JSONObject data) {
-        address = data.optString("formatted_address");
-    }
-
-    @Override
-    public JSONObject toJSON() {
-        JSONObject data = new JSONObject();
-
-        try {
-            data.put("formatted_address", address);
-        } catch (JSONException e) {}
-
-        return data;
-    }
+interface JSONPopulator {
+    fun populate(data: JSONObject?)
+    fun toJSON(): JSONObject
 }
