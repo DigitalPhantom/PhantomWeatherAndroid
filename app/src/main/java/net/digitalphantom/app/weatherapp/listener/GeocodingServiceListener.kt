@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  *
- * Copyright (c) 2015 Yoel Nunez <dev@nunez.guru>
+ * Copyright (c) 2015 - 2022 Yoel Nunez <dev@nunez.guru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,33 +22,11 @@
  * THE SOFTWARE.
  *
  */
-package net.digitalphantom.app.weatherapp.data;
+package net.digitalphantom.app.weatherapp.listener
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import net.digitalphantom.app.weatherapp.data.LocationResult
 
-public class Units implements JSONPopulator {
-    private String temperature;
-
-    public String getTemperature() {
-        return temperature;
-    }
-
-    @Override
-    public void populate(JSONObject data) {
-        temperature = data.optString("temperature");
-    }
-
-    @Override
-    public JSONObject toJSON() {
-        JSONObject data = new JSONObject();
-
-        try {
-            data.put("temperature", temperature);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return data;
-    }
+interface GeocodingServiceListener {
+    fun geocodeSuccess(location: LocationResult?)
+    fun geocodeFailure(exception: Exception?)
 }
